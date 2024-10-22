@@ -7,10 +7,29 @@ function initialAnalyze()
 {
   registerProperties(1,0,0,0);
   analyzeRank();
-  let url_webhook = PropertiesService.getScriptProperties().getProperty('webhook');
-  let payload = {"content": '国内株式の配当利回りランキングが更新されました\nhttps://docs.google.com/spreadsheets/d/' + getID()};
-  let options = {"method": "post", "payload": payload};
-  UrlFetchApp.fetch(url_webhook, options);
+  notifyIRupdate();
+}
+
+function notifyIRupdate()
+{
+  let overview = SpreadsheetApp.openById(getID()).getSheetByName("Rank").getRange("A2:E6").getValues();
+  let description = [];
+  for(var row of overview)
+  {
+    description.push(row.join(" "));
+  }
+  let payload = {
+    "embeds": [
+      {
+        "author": {name: "Google Docs"},
+        "title": '国内株式の配当利回りランキングが更新されました',
+        "url": 'https://docs.google.com/spreadsheets/d/' + getID(),
+        "description": description.join("\n"),
+        "color": parseInt("009601",16)
+      }
+    ]
+  }
+  postWebhook(payload, 'webhook');
 }
 
 function analyzeRank()
@@ -21,22 +40,21 @@ function analyzeRank()
   const spreadSheet = SpreadsheetApp.openById(idSheet);
   const blackListSheet = spreadSheet.getSheetByName("Black List");
   const rankSheet = spreadSheet.getSheetByName("Rank");
+  const topixSheet = spreadSheet.getSheetByName("TOPIX");
   const analysisNum = 100;
 
   let blackListRoot = blackListSheet.getRange("A:A").getValues();
   let annualBlackListRoot = blackListSheet.getRange("B:B").getValues();
   let blackList = compileIntList(blackListRoot);
   let annualBlackList = compileIntList(annualBlackListRoot);
+  let bigStockList = compileIntList(topixSheet.getRange("A:A").getValues());
+  let midStockList = compileIntList(topixSheet.getRange("B:B").getValues());
   let savedYear = blackListSheet.getRange("C1").getValue();
   let newBlackCount = 0;
   let newAnnualCount = 0;
   
-  let count = Number(PropertiesService.getScriptProperties().getProperty('count'));
-  if(!count) count = 0;
-  //let count = 0;
-  let checkCount = Number(PropertiesService.getScriptProperties().getProperty('checkCount'));
-  if(!checkCount) checkCount = 0;
-  //let checkCount = 0;
+  let count = getNumProperty('count');
+  let checkCount = getNumProperty('checkCount');
   let startTime = new Date();
   let year = startTime.getFullYear();
 
@@ -52,12 +70,8 @@ function analyzeRank()
   }
 
   // Scrape Yahoo Finance
-  let startPage = Number(PropertiesService.getScriptProperties().getProperty('page'));
-  if(!startPage) startPage = 1;
-  //startPage = 1;
-  let startIndex = Number(PropertiesService.getScriptProperties().getProperty('index'));
-  if(!startIndex) startIndex = 0;
-  //startIndex = 0;
+  let startPage = getNumProperty('page', 1);
+  let startIndex = getNumProperty('index');
 
   for(var page=startPage; true; page++)
   {
@@ -160,6 +174,12 @@ function analyzeRank()
       var res_genre = UrlFetchApp.fetch((corp.url).split("/result")[0]).getContentText("utf-8");
       corp.genre = Parser.data(res_genre).from('<a title="業種').to('</a>').build();
       corp.genre = corp.genre.split(">")[1];
+      if(bigStockList.includes(corp.code))
+        corp.size = "大型株";
+      else if(midStockList.includes(corp.code))
+        corp.size = "中型株";
+      else
+        corp.size = "小型株";
 
       ++count;
 
@@ -184,18 +204,20 @@ function registerProperties(page, i, count, checkCount)
 
 function registerCorp(rankSheet, corp, count)
 {
-  rankSheet.getRange(count+1, 1).setValue(corp.code);
-  rankSheet.getRange(count+1, 2).setValue(`=HYPERLINK("${corp.url}","${corp.name}")`);
-  rankSheet.getRange(count+1, 3).setValue(corp.genre);
-  rankSheet.getRange(count+1, 4).setValue(`${corp.dy}%`);
-  rankSheet.getRange(count+1, 5).setValue(checkGrowth(corp.perf[0]));
-  rankSheet.getRange(count+1, 6).setValue(checkGrowth(corp.perf[1]));
-  rankSheet.getRange(count+1, 7).setValue(corp.perf[2][corp.perf[2].length-1]);
-  rankSheet.getRange(count+1, 8).setValue(corp.finance[0][corp.finance[0].length-1]);
-  rankSheet.getRange(count+1, 9).setValue(checkGrowth(corp.cf[0]));
-  rankSheet.getRange(count+1,10).setValue(checkGrowth(corp.cf[1]));
-  rankSheet.getRange(count+1,11).setValue(checkGrowth(corp.share[0]));
-  rankSheet.getRange(count+1,12).setValue(corp.share[1][corp.share[1].length-1]);
+  let i=1;
+  rankSheet.getRange(count+1,i++).setValue(corp.code);
+  rankSheet.getRange(count+1,i++).setValue(`=HYPERLINK("${corp.url}","${corp.name}")`);
+  rankSheet.getRange(count+1,i++).setValue(corp.genre);
+  rankSheet.getRange(count+1,i++).setValue(corp.size);
+  rankSheet.getRange(count+1,i++).setValue(`${corp.dy}%`);
+  rankSheet.getRange(count+1,i++).setValue(checkGrowth(corp.perf[0]));
+  rankSheet.getRange(count+1,i++).setValue(checkGrowth(corp.perf[1]));
+  rankSheet.getRange(count+1,i++).setValue(corp.perf[2][corp.perf[2].length-1]);
+  rankSheet.getRange(count+1,i++).setValue(corp.finance[0][corp.finance[0].length-1]);
+  rankSheet.getRange(count+1,i++).setValue(checkGrowth(corp.cf[0]));
+  rankSheet.getRange(count+1,i++).setValue(checkGrowth(corp.cf[1]));
+  rankSheet.getRange(count+1,i++).setValue(checkGrowth(corp.share[0]));
+  rankSheet.getRange(count+1,i++).setValue(corp.share[1][corp.share[1].length-1]);
   Logger.log(`Registered: ${corp.code} (${corp.name})`);
 }
 
@@ -317,41 +339,5 @@ function extractData(section, indicators)
     }
   }
 
-  return result;
-}
-
-function getTextContent(res, elem, bIgnore)
-{
-  return getTextContents(res, elem, bIgnore)[0];
-}
-
-function getTextContents(res, elem, bIgnore)
-{
-  if(bIgnore)
-  {
-    var temps = Parser.data(res).from('<' + elem).to('/' + elem + '>').iterate();
-    for(var i=0; i<temps.length; i++)
-    {
-      temps[i] = Parser.data(temps[i]).from('>').to('<').build();
-    }
-    return temps;
-  }
-  else
-  {
-    return Parser.data(res).from('<' + elem + '>').to('</' + elem + '>').iterate();
-  }
-}
-
-function compileIntList(root)
-{
-  let result = [];
-  
-  for(var i=0; i<root.length; i++)
-  {
-    if(root[i][0] != "")
-    {
-      result.push(String(Math.floor(root[i][0])));
-    }
-  }
   return result;
 }
