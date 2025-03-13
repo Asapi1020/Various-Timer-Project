@@ -3,8 +3,8 @@ import type { Earthquake } from "../domain";
 import { toEarthquake } from "../interface-adapters/earthquake";
 
 export class EarthquakeRepository {
-	typhoonHost = "https://typhoon.yahoo.co.jp";
-	earthquakeUrl = `${this.typhoonHost}/weather/jp/earthquake/list/`;
+	private typhoonHost = "https://typhoon.yahoo.co.jp";
+	private earthquakeUrl = `${this.typhoonHost}/weather/jp/earthquake/list/`;
 
 	async getEarthquakeData(): Promise<Earthquake.Data[]> {
 		const response = await fetch(this.earthquakeUrl);
@@ -29,5 +29,15 @@ export class EarthquakeRepository {
 		});
 
 		return tableData.get();
+	}
+
+	async getEarthquakeImage(url: string): Promise<string | null> {
+		const response = await fetch(url);
+		const html = await response.text();
+		const $ = cheerio.load(html);
+
+		const imgElement = $("#earthquake-01 img");
+		const urlImg = imgElement.attr("src");
+		return urlImg?.endsWith(".png") ? urlImg : null;
 	}
 }
