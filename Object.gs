@@ -1,3 +1,13 @@
+/**
+ * @param {UrlFetchApp.HTTPResponse} response
+ * @returns {object} The parsed JSON object.
+ */
+const getJSON = (response) => {
+  const body = response.getContentText();
+  const jsonData = JSON.parse(body);
+  return jsonData;
+}
+
 function getTextContent(res, elem, bIgnore)
 {
   return getTextContents(res, elem, bIgnore)[0];
