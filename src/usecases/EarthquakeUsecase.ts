@@ -14,13 +14,13 @@ export class EarthquakeUsecase {
 		return await this.earthquakeRepository.getEarthquakeData();
 	}
 
-	async alertEarthquake(lastAlerted: Date): Promise<Date | undefined> {
+	async alertEarthquake(lastAlerted: Date): Promise<Date> {
 		const data = await this.earthquakeRepository.getEarthquakeData();
 		const dataToAlert = data.filter(
 			(datum) => datum.time.getTime() > lastAlerted.getTime(),
 		);
 		if (dataToAlert.length === 0) {
-			return;
+			return lastAlerted;
 		}
 
 		const dataToAlertSorted = dataToAlert.sort(
@@ -40,7 +40,7 @@ export class EarthquakeUsecase {
 				embeds: [
 					{
 						title: "地震情報",
-						description: `震源地：${datum.epicenter}\n最大震度：${datum.seismicIntensity}\nマグニチュード：${datum.magnitude}\n}`,
+						description: `震源地：${datum.epicenter}\n最大震度：${datum.seismicIntensity}\nマグニチュード：${datum.magnitude}`,
 						author: { name: "Yahoo!天気・災害" },
 						url: datum.link,
 						color: 0xf8e71c,
