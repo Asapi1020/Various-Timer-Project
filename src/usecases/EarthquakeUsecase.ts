@@ -36,6 +36,15 @@ export class EarthquakeUsecase {
 				break;
 			}
 
+			const intensityNumber = Number.parseInt(
+				datum.seismicIntensity.match(/\d+/)?.[0] || "0",
+				10,
+			);
+			if (intensityNumber < 4) {
+				latestTime = datum.time;
+				break;
+			}
+
 			const payload: Discord.Payload = {
 				embeds: [
 					{
