@@ -70,11 +70,13 @@ export class WorkshopRepository {
 		const posted = detailsMap.get("Posted");
 		const updated = detailsMap.get("Updated");
 		const descriptionHTML = $("div#highlightContent").html();
+		const authorAvatar = $("div.playerAvatar img").attr("src");
 		const data = toWorkshopDetailData(
 			preview,
 			descriptionHTML,
 			posted,
 			updated,
+			authorAvatar,
 		);
 		return data;
 	}

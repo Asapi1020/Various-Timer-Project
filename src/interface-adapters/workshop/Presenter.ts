@@ -41,6 +41,7 @@ export const toWorkshopDetailData = (
 	descriptionHTML: string,
 	posted: string,
 	updated?: string,
+	authorAvatar?: string,
 ): Workshop.DetailData => {
 	const turndownService = new TurndownService();
 	turndownService.addRule("no-link-to-text", {
@@ -66,6 +67,7 @@ export const toWorkshopDetailData = (
 		description,
 		postedAt,
 		updatedAt,
+		authorAvatar: convertToString(authorAvatar),
 	};
 };
 

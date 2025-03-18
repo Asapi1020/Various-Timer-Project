@@ -13,6 +13,7 @@ export interface DetailData {
 	postedAt: Date;
 	updatedAt?: Date;
 	preview?: string;
+	authorAvatar?: string;
 }
 
 export type Data = BasicData & DetailData;

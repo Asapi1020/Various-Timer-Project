@@ -59,7 +59,11 @@ export class WorkshopUsecase {
 					{
 						title: datum.title,
 						description: datum.description,
-						author: { name: datum.author.name, url: datum.author.link }, // TODO: author icon
+						author: {
+							name: datum.author.name,
+							url: datum.author.link,
+							icon_url: datum.authorAvatar,
+						},
 						url: datum.link,
 						thumbnail: { url: datum.thumbnail },
 						image: datum.preview ? { url: datum.preview } : undefined,
