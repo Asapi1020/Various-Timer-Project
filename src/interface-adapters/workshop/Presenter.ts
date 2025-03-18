@@ -1,3 +1,4 @@
+import { isDate, isString } from "@asp1020/type-utils";
 import { DateTime } from "luxon";
 import TurndownService from "turndown";
 import type { Workshop } from "../../domain";
@@ -10,11 +11,11 @@ export const toWorkshopBasicData = (
 	authorName: string,
 ): Workshop.BasicData => {
 	if (
-		typeof title !== "string" ||
-		typeof link !== "string" ||
-		typeof thumbnail !== "string" ||
-		typeof authorLink !== "string" ||
-		typeof authorName !== "string"
+		!isString(title) ||
+		!isString(link) ||
+		!isString(thumbnail) ||
+		!isString(authorLink) ||
+		!isString(authorName)
 	) {
 		throw new Error("Invalid argument type");
 	}
@@ -36,17 +37,20 @@ export const toWorkshopDetailData = (
 	posted: string,
 	updated?: string,
 ): Workshop.DetailData => {
-	if (typeof preview !== "string" || typeof descriptionHTML !== "string") {
+	if (!isString(preview) || !isString(descriptionHTML)) {
 		throw new Error("Invalid argument type");
 	}
 
 	const description = new TurndownService().turndown(descriptionHTML);
 	const postedAt = convertTime(posted);
 	const updatedAt = updated ? convertTime(updated) : undefined;
+	if (!isDate(postedAt)) {
+		throw new Error("Invalid argument type");
+	}
 
 	return {
 		preview,
-		description: descriptionHTML,
+		description,
 		postedAt,
 		updatedAt,
 	};

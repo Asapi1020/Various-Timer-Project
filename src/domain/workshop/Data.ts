@@ -14,3 +14,5 @@ export interface DetailData {
 	postedAt: Date;
 	updatedAt?: Date;
 }
+
+export type Data = BasicData & DetailData;

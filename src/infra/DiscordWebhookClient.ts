@@ -1,35 +1,19 @@
 import type { Discord } from "../domain";
+import type { ForumThreadParams } from "../domain/discord";
 
 export class DiscordWebhookClient {
-	constructor(
-		private earthquakeWebhook: string,
-		private workshopWebhook: string,
-		private workshopUploadThreadID: string,
-		private workshopUpdateThreadID: string,
-	) {
+	constructor(private earthquakeWebhook: string) {
 		this.earthquakeWebhook = earthquakeWebhook;
-		this.workshopWebhook = workshopWebhook;
 	}
 
 	public async alertEarthquake(payload: Discord.Payload): Promise<boolean> {
 		return await this.sendMessage(this.earthquakeWebhook, payload);
 	}
 
-	public async alertWorkshopUpload(payload: Discord.Payload): Promise<boolean> {
-		return this.alertWorkshop(payload, this.workshopUploadThreadID);
-	}
-
-	public async alertWorkshopUpdate(payload: Discord.Payload): Promise<boolean> {
-		return this.alertWorkshop(payload, this.workshopUpdateThreadID);
-	}
-
-	private async alertWorkshop(
-		payload: Discord.Payload,
-		threadID: string,
-	): Promise<boolean> {
+	public async alertToForumThread(params: ForumThreadParams): Promise<boolean> {
 		return await this.sendMessage(
-			`${this.workshopWebhook}?thread_id=${threadID}`,
-			payload,
+			`${params.webhookUrl}?thread_id=${params.threadID}`,
+			params.payload,
 		);
 	}
 

@@ -9,6 +9,9 @@ export interface Payload {
 			icon_url?: string;
 		};
 		url?: string;
+		thumbnail?: {
+			url: string;
+		};
 		image?: {
 			url: string;
 		};
