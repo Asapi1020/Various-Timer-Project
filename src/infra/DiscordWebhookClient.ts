@@ -2,14 +2,6 @@ import type { Discord } from "../domain";
 import type { ForumThreadParams } from "../domain/discord";
 
 export class DiscordWebhookClient {
-	constructor(private earthquakeWebhook: string) {
-		this.earthquakeWebhook = earthquakeWebhook;
-	}
-
-	public async alertEarthquake(payload: Discord.Payload): Promise<boolean> {
-		return await this.sendMessage(this.earthquakeWebhook, payload);
-	}
-
 	public async alertToForumThread(params: ForumThreadParams): Promise<boolean> {
 		return await this.sendMessage(
 			`${params.webhookUrl}?thread_id=${params.threadID}`,
@@ -17,7 +9,7 @@ export class DiscordWebhookClient {
 		);
 	}
 
-	private async sendMessage(
+	public async sendMessage(
 		webhookUrl: string,
 		payload: Discord.Payload,
 	): Promise<boolean> {

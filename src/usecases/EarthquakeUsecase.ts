@@ -14,7 +14,7 @@ export class EarthquakeUsecase {
 		return await this.earthquakeRepository.getEarthquakeData();
 	}
 
-	async alertEarthquake(lastAlerted: Date): Promise<Date> {
+	async alertEarthquake(lastAlerted: Date, webhookUrl: string): Promise<Date> {
 		const data = await this.earthquakeRepository.getEarthquakeData();
 		const dataToAlert = data.filter(
 			(datum) => datum.time.getTime() > lastAlerted.getTime(),
@@ -58,8 +58,10 @@ export class EarthquakeUsecase {
 					},
 				],
 			};
-			const isSuccess =
-				await this.discordWebhookClient.alertEarthquake(payload);
+			const isSuccess = await this.discordWebhookClient.sendMessage(
+				webhookUrl,
+				payload,
+			);
 			if (!isSuccess) {
 				break;
 			}
