@@ -24,32 +24,35 @@ export class WorkshopUsecase {
 	}
 
 	async checkWorkshop(props: WorkshopProps): Promise<Date> {
-		const basicData = await this.getWorkshopData(props.appID, "lastUpdated");
-		const data: Workshop.Data[] = [];
-		for (const datum of basicData) {
-			try {
-				const detail = await this.getWorkshopDetail(datum.link);
-				if (
-					(detail.updatedAt ?? detail.postedAt).getTime() <=
-					props.lastAlerted.getTime()
-				) {
-					break;
-				}
-				data.push({ ...datum, ...detail });
-			} catch (error) {
-				console.error(error);
-			}
-		}
+		console.log(props);
+		const uploadedData = await this.getCompleteData(
+			props.appID,
+			"lastUploaded",
+			props.lastAlerted,
+		);
+		const updatedData = await this.getCompleteData(
+			props.appID,
+			"lastUpdated",
+			props.lastAlerted,
+		);
+		const filteredUpdatedData = updatedData.filter(
+			(datum) => !uploadedData.some((d) => d.link === datum.link),
+		);
+		const data = [...uploadedData, ...filteredUpdatedData];
 
 		const dataSorted = data.sort(
 			(a, b) =>
-				(b.updatedAt ?? b.postedAt).getTime() -
-				(a.updatedAt ?? a.postedAt).getTime(),
+				(a.updatedAt ?? a.postedAt).getTime() -
+				(b.updatedAt ?? b.postedAt).getTime(),
 		);
 
 		let latestTime = props.lastAlerted;
 		for (const datum of dataSorted) {
-			const time = datum.updatedAt ?? datum.postedAt;
+			const isFirstUpload =
+				datum.postedAt.getTime() > props.lastAlerted.getTime();
+			const time = isFirstUpload
+				? datum.postedAt
+				: (datum.updatedAt ?? datum.postedAt);
 
 			const payload: Discord.Payload = {
 				embeds: [
@@ -59,16 +62,16 @@ export class WorkshopUsecase {
 						author: { name: datum.author.name, url: datum.author.link }, // TODO: author icon
 						url: datum.link,
 						thumbnail: { url: datum.thumbnail },
-						image: { url: datum.preview },
+						image: datum.preview ? { url: datum.preview } : undefined,
 						color: 0x0024c4,
 						timestamp: time.toISOString(),
 					},
 				],
 			};
 
-			const threadID = datum.updatedAt
-				? props.lastUpdatedThreadID
-				: props.lastUploadedThreadID;
+			const threadID = isFirstUpload
+				? props.lastUploadedThreadID
+				: props.lastUpdatedThreadID;
 
 			const isSuccess = await this.discordWebhookClient
 				.alertToForumThread({
@@ -83,5 +86,32 @@ export class WorkshopUsecase {
 			latestTime = time;
 		}
 		return latestTime;
+	}
+
+	private async getCompleteData(
+		appID: number,
+		sort: "lastUploaded" | "lastUpdated",
+		lastAlerted: Date,
+	): Promise<Workshop.Data[]> {
+		const basicData = await this.getWorkshopData(appID, sort);
+
+		const data: Workshop.Data[] = [];
+		for (const datum of basicData) {
+			try {
+				const detail = await this.getWorkshopDetail(datum.link);
+				if (
+					(sort === "lastUploaded"
+						? detail.postedAt
+						: detail.updatedAt
+					).getTime() <= lastAlerted.getTime()
+				) {
+					break;
+				}
+				data.push({ ...datum, ...detail });
+			} catch (error) {
+				console.error(error);
+			}
+		}
+		return data;
 	}
 }

@@ -9,10 +9,10 @@ export interface BasicData {
 }
 
 export interface DetailData {
-	preview: string;
 	description: string;
 	postedAt: Date;
 	updatedAt?: Date;
+	preview?: string;
 }
 
 export type Data = BasicData & DetailData;

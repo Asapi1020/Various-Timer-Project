@@ -67,8 +67,8 @@ export class WorkshopRepository {
 				return element.text().trim();
 			});
 		const detailsMap = new Map(header.map((h, i) => [h, content[i]]));
-		const posted = detailsMap.get("Posted ");
-		const updated = detailsMap.get("Updated ");
+		const posted = detailsMap.get("Posted");
+		const updated = detailsMap.get("Updated");
 		const descriptionHTML = $("div#highlightContent").html();
 		const data = toWorkshopDetailData(
 			preview,

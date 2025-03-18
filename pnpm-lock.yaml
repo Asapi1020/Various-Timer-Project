@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@asp1020/type-utils':
-        specifier: ^1.0.2
-        version: 1.0.2
+        specifier: ^1.0.4
+        version: 1.0.4
       cheerio:
         specifier: ^1.0.0
         version: 1.0.0
@@ -42,8 +42,8 @@ importers:
 
 packages:
 
-  '@asp1020/type-utils@1.0.2':
-    resolution: {integrity: sha512-YVVGyQRI/SmNnFTmfB/4h7ndF2x7wPpDUrILuAebrZYUDCdP9g9dKuMlxtioPOjvD/SN0jeKj2lo03mIv4c8ag==}
+  '@asp1020/type-utils@1.0.4':
+    resolution: {integrity: sha512-bYAX5B5VGcc/4Pm7Gi4OlwSx9XUJEDEWayhkJbtlx3fro4l6guXl1m0ZMgEUtBkm41zP16mHV+ri1pUNv2EYIw==}
 
   '@biomejs/biome@1.9.4':
     resolution: {integrity: sha512-1rkd7G70+o9KkTn5KLmDYXihGoTaIGO9PIIN2ZB7UJxFrWw04CZHPYiMRjYsaDvVV7hP1dYNRLxSANLaBFGpog==}
@@ -921,7 +921,7 @@ packages:
 
 snapshots:
 
-  '@asp1020/type-utils@1.0.2':
+  '@asp1020/type-utils@1.0.4':
     dependencies:
       ramda: 0.30.1
 

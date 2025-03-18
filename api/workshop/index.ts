@@ -1,3 +1,4 @@
+import { toNumber } from "@asp1020/type-utils";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { DiscordWebhookClient, WorkshopRepository } from "../../src/infra";
 import { WorkshopUsecase } from "../../src/usecases";
@@ -5,11 +6,8 @@ import { WorkshopUsecase } from "../../src/usecases";
 export default async function handler(req: VercelRequest, res: VercelResponse) {
 	try {
 		const { appID, sort } = req.query;
-		const appIDNum = Number(appID);
-		if (
-			Number.isNaN(appIDNum) ||
-			(sort !== "lastUploaded" && sort !== "lastUpdated")
-		) {
+		const appIDNum = toNumber(appID);
+		if (!appIDNum || (sort !== "lastUploaded" && sort !== "lastUpdated")) {
 			throw new Error("Invalid query parameters");
 		}
 		const workshopRepository = new WorkshopRepository();

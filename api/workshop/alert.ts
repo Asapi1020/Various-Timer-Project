@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { DiscordWebhookClient, WorkshopRepository } from "../../src/infra";
-import { toWorkshopProps } from "../../src/interface-adapters/workshop/Controller";
+import { toWorkshopProps } from "../../src/interface-adapters/workshop";
 import { WorkshopUsecase } from "../../src/usecases";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {

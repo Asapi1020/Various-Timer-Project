@@ -8,9 +8,7 @@ export default async function handler(
 ) {
 	try {
 		const earthquakeRepository = new EarthquakeRepository();
-		const discordWebhookClient = new DiscordWebhookClient(
-			process.env.EARTHQUAKE_WEBHOOK_URL,
-		);
+		const discordWebhookClient = new DiscordWebhookClient();
 		const earthquakeUsecase = new EarthquakeUsecase(
 			earthquakeRepository,
 			discordWebhookClient,
