@@ -58,7 +58,7 @@ export const toWorkshopDetailData = (
 	const postedAt = convertTime(posted);
 	const updatedAt = convertTime(updated);
 	if (!isDate(postedAt)) {
-		console.error(postedAt);
+		console.error(posted);
 		throw new Error("Invalid argument type");
 	}
 
@@ -76,7 +76,7 @@ const convertTime = (time: string): Date => {
 		return null;
 	}
 
-	const formatter = time.includes(",") ? "d LLL yyyy h:mma" : "d LLL h:mma";
+	const formatter = time.includes(",") ? "LLL d yyyy h:mma" : "LLL d h:mma";
 	const formattedTime = time
 		.replace("@", "")
 		.replace(",", "")

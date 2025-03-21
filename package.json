@@ -8,6 +8,7 @@
 		"typescript": "^5.8.2"
 	},
 	"dependencies": {
+		"@asp1020/discord-webhook-client": "^1.0.0",
 		"@asp1020/type-utils": "^1.0.4",
 		"cheerio": "^1.0.0",
 		"luxon": "^3.5.0",

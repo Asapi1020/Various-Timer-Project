@@ -1,13 +1,10 @@
+import { type Payload, sendMessage } from "@asp1020/discord-webhook-client";
 import type { Discord, Earthquake } from "../domain";
-import type { DiscordWebhookClient, EarthquakeRepository } from "../infra";
+import type { EarthquakeRepository } from "../infra";
 
 export class EarthquakeUsecase {
-	constructor(
-		private earthquakeRepository: EarthquakeRepository,
-		private discordWebhookClient: DiscordWebhookClient,
-	) {
+	constructor(private earthquakeRepository: EarthquakeRepository) {
 		this.earthquakeRepository = earthquakeRepository;
-		this.discordWebhookClient = discordWebhookClient;
 	}
 
 	async getEarthquakeData(): Promise<Earthquake.Data[] | null> {
@@ -45,7 +42,7 @@ export class EarthquakeUsecase {
 				break;
 			}
 
-			const payload: Discord.Payload = {
+			const payload: Payload = {
 				embeds: [
 					{
 						title: "地震情報",
@@ -58,10 +55,7 @@ export class EarthquakeUsecase {
 					},
 				],
 			};
-			const isSuccess = await this.discordWebhookClient.sendMessage(
-				webhookUrl,
-				payload,
-			);
+			const isSuccess = await sendMessage(webhookUrl, payload);
 			if (!isSuccess) {
 				break;
 			}

@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { DiscordWebhookClient, EarthquakeRepository } from "../../src/infra";
+import { EarthquakeRepository } from "../../src/infra";
 import { EarthquakeUsecase } from "../../src/usecases";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -22,11 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		}
 
 		const earthquakeRepository = new EarthquakeRepository();
-		const discordWebhookClient = new DiscordWebhookClient();
-		const earthquakeUsecase = new EarthquakeUsecase(
-			earthquakeRepository,
-			discordWebhookClient,
-		);
+		const earthquakeUsecase = new EarthquakeUsecase(earthquakeRepository);
 
 		const data = await earthquakeUsecase.alertEarthquake(
 			lastAlertedDate,

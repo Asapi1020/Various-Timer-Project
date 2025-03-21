@@ -1,4 +1,4 @@
-import type { Payload } from "./Payload";
+import type { Payload } from "@asp1020/discord-webhook-client";
 
 export interface ForumThreadParams {
 	payload: Payload;

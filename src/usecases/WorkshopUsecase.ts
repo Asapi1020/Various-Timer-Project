@@ -1,15 +1,14 @@
+import {
+	type Payload,
+	sendForumThreadMessage,
+} from "@asp1020/discord-webhook-client";
 import type { Discord, Workshop } from "../domain";
 import type { WorkshopProps } from "../domain/discord";
-import type { DiscordWebhookClient } from "../infra";
 import type { WorkshopRepository } from "../infra/WorkshopRepository";
 
 export class WorkshopUsecase {
-	constructor(
-		private workshopRepository: WorkshopRepository,
-		private discordWebhookClient: DiscordWebhookClient,
-	) {
+	constructor(private workshopRepository: WorkshopRepository) {
 		this.workshopRepository = workshopRepository;
-		this.discordWebhookClient = discordWebhookClient;
 	}
 
 	async getWorkshopData(
@@ -54,7 +53,7 @@ export class WorkshopUsecase {
 				? datum.postedAt
 				: (datum.updatedAt ?? datum.postedAt);
 
-			const payload: Discord.Payload = {
+			const payload: Payload = {
 				embeds: [
 					{
 						title: datum.title,
@@ -77,13 +76,11 @@ export class WorkshopUsecase {
 				? props.lastUploadedThreadID
 				: props.lastUpdatedThreadID;
 
-			const isSuccess = await this.discordWebhookClient
-				.alertToForumThread({
-					payload,
-					webhookUrl: props.webhookUrl,
-					threadID,
-				})
-				.catch(() => false);
+			const isSuccess = await sendForumThreadMessage(
+				props.webhookUrl,
+				threadID,
+				payload,
+			).catch(() => false);
 			if (!isSuccess) {
 				break;
 			}

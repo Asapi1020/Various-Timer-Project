@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@asp1020/discord-webhook-client':
+        specifier: ^1.0.0
+        version: 1.0.0
       '@asp1020/type-utils':
         specifier: ^1.0.4
         version: 1.0.4
@@ -41,6 +44,9 @@ importers:
         version: 5.8.2
 
 packages:
+
+  '@asp1020/discord-webhook-client@1.0.0':
+    resolution: {integrity: sha512-Qneygt8SeanEHvUBePxtMT2oWR6tHTz2RQxT0tbch26bntGlSq/cJLwVAHiKP0GJY5Ox8PMA+M0YEXw3xxIY9g==}
 
   '@asp1020/type-utils@1.0.4':
     resolution: {integrity: sha512-bYAX5B5VGcc/4Pm7Gi4OlwSx9XUJEDEWayhkJbtlx3fro4l6guXl1m0ZMgEUtBkm41zP16mHV+ri1pUNv2EYIw==}
@@ -920,6 +926,8 @@ packages:
     engines: {node: '>=6'}
 
 snapshots:
+
+  '@asp1020/discord-webhook-client@1.0.0': {}
 
   '@asp1020/type-utils@1.0.4':
     dependencies:

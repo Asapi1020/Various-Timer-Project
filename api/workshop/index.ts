@@ -1,6 +1,6 @@
 import { toNumber } from "@asp1020/type-utils";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { DiscordWebhookClient, WorkshopRepository } from "../../src/infra";
+import { WorkshopRepository } from "../../src/infra";
 import { WorkshopUsecase } from "../../src/usecases";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -11,11 +11,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			throw new Error("Invalid query parameters");
 		}
 		const workshopRepository = new WorkshopRepository();
-		const discordWebhookClient = new DiscordWebhookClient();
-		const workshopUsecase = new WorkshopUsecase(
-			workshopRepository,
-			discordWebhookClient,
-		);
+		const workshopUsecase = new WorkshopUsecase(workshopRepository);
 		const data = await workshopUsecase.getWorkshopData(appIDNum, sort);
 		res.status(200).json({ data });
 	} catch (error) {
