@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { EarthquakeRepository } from "../../src/infra";
 import { EarthquakeUsecase } from "../../src/usecases";
+import { notifyError } from "../../src/usecases/ErrorHandler";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
 	try {
@@ -30,6 +31,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		);
 		res.status(200).json({ data });
 	} catch (error) {
+		await notifyError(error, "Earthquake Alert Error").catch((error) => {
+			console.error("Failed to notify error", error);
+		});
 		res.status(500).json({ error: error.message });
 	}
 }
