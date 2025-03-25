@@ -63,3 +63,13 @@ function checkKF2Workshop() {
 
 	properties.setProperty("KF2_WORKSHOP_LAST_ALERTED", data);
 }
+
+/**
+ * @param {UrlFetchApp.HTTPResponse} response
+ * @returns {object} The parsed JSON object.
+ */
+const getJSON = (response) => {
+	const body = response.getContentText();
+	const jsonData = JSON.parse(body);
+	return jsonData;
+};
