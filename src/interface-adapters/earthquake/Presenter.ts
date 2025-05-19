@@ -18,10 +18,6 @@ export const toEarthquake = (
 };
 
 const convertTime = (time: string): Date | null => {
-	const date = DateTime.fromFormat(
-		time.replace("ごろ", ""),
-		"yyyy年M月d日 H時m分",
-		{ zone: "Asia/Tokyo" },
-	);
+	const date = DateTime.fromFormat(time.replace("ごろ", ""), "yyyy年M月d日 H時m分", { zone: "Asia/Tokyo" });
 	return date.isValid ? date.toJSDate() : null;
 };

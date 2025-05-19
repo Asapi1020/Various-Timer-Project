@@ -12,8 +12,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		}
 
 		const { lastAlerted } = req.query; // UTC date string
-		const lastAlertedDate =
-			typeof lastAlerted === "string" ? new Date(lastAlerted) : new Date();
+		const lastAlertedDate = typeof lastAlerted === "string" ? new Date(lastAlerted) : new Date();
 		if (Number.isNaN(lastAlertedDate.getTime())) {
 			throw new Error("lastAlerted is not a valid date");
 		}
@@ -25,10 +24,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		const earthquakeRepository = new EarthquakeRepository();
 		const earthquakeUsecase = new EarthquakeUsecase(earthquakeRepository);
 
-		const data = await earthquakeUsecase.alertEarthquake(
-			lastAlertedDate,
-			webhookUrl,
-		);
+		const data = await earthquakeUsecase.alertEarthquake(lastAlertedDate, webhookUrl);
 		res.status(200).json({ data });
 	} catch (error) {
 		await notifyError(error, "Earthquake Alert Error").catch((error) => {
