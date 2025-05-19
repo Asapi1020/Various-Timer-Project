@@ -1,8 +1,5 @@
-import {
-	type Payload,
-	sendForumThreadMessage,
-} from "@asp1020/discord-webhook-client";
-import type { Discord, Workshop } from "../domain";
+import { type Payload, sendForumThreadMessage } from "@asp1020/discord-webhook-client";
+import type { Workshop } from "../domain";
 import type { WorkshopProps } from "../domain/discord";
 import type { WorkshopRepository } from "../infra/WorkshopRepository";
 
@@ -11,10 +8,7 @@ export class WorkshopUsecase {
 		this.workshopRepository = workshopRepository;
 	}
 
-	async getWorkshopData(
-		appID: number,
-		sort: "lastUploaded" | "lastUpdated",
-	): Promise<Workshop.BasicData[]> {
+	async getWorkshopData(appID: number, sort: "lastUploaded" | "lastUpdated"): Promise<Workshop.BasicData[]> {
 		return await this.workshopRepository.getWorkshopData(appID, sort);
 	}
 
@@ -24,34 +18,19 @@ export class WorkshopUsecase {
 
 	async checkWorkshop(props: WorkshopProps): Promise<Date> {
 		console.log(props);
-		const uploadedData = await this.getCompleteData(
-			props.appID,
-			"lastUploaded",
-			props.lastAlerted,
-		);
-		const updatedData = await this.getCompleteData(
-			props.appID,
-			"lastUpdated",
-			props.lastAlerted,
-		);
-		const filteredUpdatedData = updatedData.filter(
-			(datum) => !uploadedData.some((d) => d.link === datum.link),
-		);
+		const uploadedData = await this.getCompleteData(props.appID, "lastUploaded", props.lastAlerted);
+		const updatedData = await this.getCompleteData(props.appID, "lastUpdated", props.lastAlerted);
+		const filteredUpdatedData = updatedData.filter((datum) => !uploadedData.some((d) => d.link === datum.link));
 		const data = [...uploadedData, ...filteredUpdatedData];
 
 		const dataSorted = data.sort(
-			(a, b) =>
-				(a.updatedAt ?? a.postedAt).getTime() -
-				(b.updatedAt ?? b.postedAt).getTime(),
+			(a, b) => (a.updatedAt ?? a.postedAt).getTime() - (b.updatedAt ?? b.postedAt).getTime(),
 		);
 
 		let latestTime = props.lastAlerted;
 		for (const datum of dataSorted) {
-			const isFirstUpload =
-				datum.postedAt.getTime() > props.lastAlerted.getTime();
-			const time = isFirstUpload
-				? datum.postedAt
-				: (datum.updatedAt ?? datum.postedAt);
+			const isFirstUpload = datum.postedAt.getTime() > props.lastAlerted.getTime();
+			const time = isFirstUpload ? datum.postedAt : (datum.updatedAt ?? datum.postedAt);
 
 			const payload: Payload = {
 				embeds: [
@@ -72,15 +51,9 @@ export class WorkshopUsecase {
 				],
 			};
 
-			const threadID = isFirstUpload
-				? props.lastUploadedThreadID
-				: props.lastUpdatedThreadID;
+			const threadID = isFirstUpload ? props.lastUploadedThreadID : props.lastUpdatedThreadID;
 
-			const isSuccess = await sendForumThreadMessage(
-				props.webhookUrl,
-				threadID,
-				payload,
-			).catch(() => false);
+			const isSuccess = await sendForumThreadMessage(props.webhookUrl, threadID, payload).catch(() => false);
 			if (!isSuccess) {
 				break;
 			}
@@ -100,12 +73,7 @@ export class WorkshopUsecase {
 		for (const datum of basicData) {
 			try {
 				const detail = await this.getWorkshopDetail(datum.link);
-				if (
-					(sort === "lastUploaded"
-						? detail.postedAt
-						: detail.updatedAt
-					).getTime() <= lastAlerted.getTime()
-				) {
+				if ((sort === "lastUploaded" ? detail.postedAt : detail.updatedAt).getTime() <= lastAlerted.getTime()) {
 					break;
 				}
 				data.push({ ...datum, ...detail });

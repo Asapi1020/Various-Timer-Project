@@ -1,5 +1,5 @@
 import { type Payload, sendMessage } from "@asp1020/discord-webhook-client";
-import type { Discord, Earthquake } from "../domain";
+import type { Earthquake } from "../domain";
 import type { EarthquakeRepository } from "../infra";
 
 export class EarthquakeUsecase {
@@ -13,30 +13,21 @@ export class EarthquakeUsecase {
 
 	async alertEarthquake(lastAlerted: Date, webhookUrl: string): Promise<Date> {
 		const data = await this.earthquakeRepository.getEarthquakeData();
-		const dataToAlert = data.filter(
-			(datum) => datum.time.getTime() > lastAlerted.getTime(),
-		);
+		const dataToAlert = data.filter((datum) => datum.time.getTime() > lastAlerted.getTime());
 		if (dataToAlert.length === 0) {
 			return lastAlerted;
 		}
 
-		const dataToAlertSorted = dataToAlert.sort(
-			(a, b) => a.time.getTime() - b.time.getTime(),
-		);
+		const dataToAlertSorted = dataToAlert.sort((a, b) => a.time.getTime() - b.time.getTime());
 
 		let latestTime = lastAlerted;
 		for (const datum of dataToAlertSorted) {
-			const image = await this.earthquakeRepository.getEarthquakeImage(
-				datum.link,
-			);
+			const image = await this.earthquakeRepository.getEarthquakeImage(datum.link);
 			if (image === null) {
 				break;
 			}
 
-			const intensityNumber = Number.parseInt(
-				datum.seismicIntensity.match(/\d+/)?.[0] || "0",
-				10,
-			);
+			const intensityNumber = Number.parseInt(datum.seismicIntensity.match(/\d+/)?.[0] || "0", 10);
 			if (intensityNumber < 4) {
 				latestTime = datum.time;
 				break;

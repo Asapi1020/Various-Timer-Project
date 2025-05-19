@@ -1,24 +1,16 @@
 import * as cheerio from "cheerio";
 import type { Workshop } from "../domain";
-import {
-	toWorkshopBasicData,
-	toWorkshopDetailData,
-} from "../interface-adapters/workshop";
+import { toWorkshopBasicData, toWorkshopDetailData } from "../interface-adapters/workshop";
 
 export class WorkshopRepository {
 	private workshopUrl = "https://steamcommunity.com/workshop/browse/";
 
-	async getWorkshopData(
-		appID: number,
-		sort: "lastUploaded" | "lastUpdated",
-	): Promise<Workshop.BasicData[]> {
+	async getWorkshopData(appID: number, sort: "lastUploaded" | "lastUpdated"): Promise<Workshop.BasicData[]> {
 		const sortQuery =
 			sort === "lastUpdated"
 				? "&browsesort=lastupdated&actualsort=lastupdated"
 				: "&browsesort=mostrecent&section=readytouseitems";
-		const response = await fetch(
-			`${this.workshopUrl}?appid=${appID}${sortQuery}&p=1`,
-		);
+		const response = await fetch(`${this.workshopUrl}?appid=${appID}${sortQuery}&p=1`);
 		const html = await response.text();
 		const $ = cheerio.load(html);
 
@@ -26,20 +18,12 @@ export class WorkshopRepository {
 		const items = itemPanels.map((el) => {
 			const element = $(el);
 			const itemLink = element.find("a.ugc").attr("href");
-			const thumbnail = element
-				.find("img.workshopItemPreviewImage")
-				.attr("src");
+			const thumbnail = element.find("img.workshopItemPreviewImage").attr("src");
 			const title = element.find("div.workshopItemTitle").text().trim();
 			const authorLink = element.find("a.workshop_author_link").attr("href");
 			const authorName = element.find("a.workshop_author_link").text().trim();
 
-			const data = toWorkshopBasicData(
-				title,
-				itemLink,
-				thumbnail,
-				authorLink,
-				authorName,
-			);
+			const data = toWorkshopBasicData(title, itemLink, thumbnail, authorLink, authorName);
 			return data;
 		});
 		return items;
@@ -71,13 +55,7 @@ export class WorkshopRepository {
 		const updated = detailsMap.get("Updated");
 		const descriptionHTML = $("div#highlightContent").html();
 		const authorAvatar = $("div.playerAvatar img").attr("src");
-		const data = toWorkshopDetailData(
-			preview,
-			descriptionHTML,
-			posted,
-			updated,
-			authorAvatar,
-		);
+		const data = toWorkshopDetailData(preview, descriptionHTML, posted, updated, authorAvatar);
 		return data;
 	}
 }

@@ -1,8 +1,4 @@
-import {
-	toString as convertToString,
-	isObject,
-	toNumber,
-} from "@asp1020/type-utils";
+import { toString as convertToString, isObject, toNumber } from "@asp1020/type-utils";
 import type { Discord } from "../../domain";
 
 export const toWorkshopProps = (query: unknown): Discord.WorkshopProps => {
@@ -14,13 +10,7 @@ export const toWorkshopProps = (query: unknown): Discord.WorkshopProps => {
 	const webhookUrl = convertToString(query.webhookUrl);
 	const lastUpdatedThreadID = convertToString(query.lastUpdatedThreadID);
 	const lastUploadedThreadID = convertToString(query.lastUploadedThreadID);
-	if (
-		!appID ||
-		!lastAlerted ||
-		!webhookUrl ||
-		!lastUpdatedThreadID ||
-		!lastUploadedThreadID
-	) {
+	if (!appID || !lastAlerted || !webhookUrl || !lastUpdatedThreadID || !lastUploadedThreadID) {
 		throw new Error("Invalid argument value");
 	}
 

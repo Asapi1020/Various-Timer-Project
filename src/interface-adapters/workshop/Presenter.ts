@@ -1,8 +1,4 @@
-import {
-	toString as convertToString,
-	isDate,
-	isString,
-} from "@asp1020/type-utils";
+import { toString as convertToString, isDate, isString } from "@asp1020/type-utils";
 import { DateTime } from "luxon";
 import TurndownService from "turndown";
 import type { Workshop } from "../../domain";
@@ -14,13 +10,7 @@ export const toWorkshopBasicData = (
 	authorLink: string,
 	authorName: string,
 ): Workshop.BasicData => {
-	if (
-		!isString(title) ||
-		!isString(link) ||
-		!isString(thumbnail) ||
-		!isString(authorLink) ||
-		!isString(authorName)
-	) {
+	if (!isString(title) || !isString(link) || !isString(thumbnail) || !isString(authorLink) || !isString(authorName)) {
 		throw new Error("Invalid argument type");
 	}
 
@@ -52,9 +42,7 @@ export const toWorkshopDetailData = (
 			return href === text ? text : `[${text}](${href})`;
 		},
 	});
-	const description = isString(descriptionHTML)
-		? turndownService.turndown(descriptionHTML)
-		: "";
+	const description = isString(descriptionHTML) ? turndownService.turndown(descriptionHTML) : "";
 	const postedAt = convertTime(posted);
 	const updatedAt = convertTime(updated);
 	if (!isDate(postedAt)) {
@@ -77,11 +65,7 @@ const convertTime = (time: string): Date => {
 	}
 
 	const formatter = time.includes(",") ? "LLL d yyyy h:mma" : "LLL d h:mma";
-	const formattedTime = time
-		.replace("@", "")
-		.replace(",", "")
-		.trim()
-		.toUpperCase();
+	const formattedTime = time.replace("@", "").replace(",", "").trim().toUpperCase();
 	const normalizedTime = formattedTime.replace(/\s+/g, " ");
 	const date = DateTime.fromFormat(normalizedTime, formatter, {
 		zone: "UTC",

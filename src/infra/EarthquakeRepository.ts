@@ -19,13 +19,7 @@ export class EarthquakeRepository {
 				.map((_, cell) => $(cell).text().trim())
 				.get();
 			const link = $(row).find("td a").attr("href");
-			return toEarthquake(
-				cells[0],
-				cells[1],
-				cells[2],
-				cells[3],
-				`${this.typhoonHost}${link}`,
-			);
+			return toEarthquake(cells[0], cells[1], cells[2], cells[3], `${this.typhoonHost}${link}`);
 		});
 
 		return tableData.get();
